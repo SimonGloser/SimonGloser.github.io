@@ -1,0 +1,77 @@
+.data
+	str1: .asciiz "Eingabe der erste  Zahl :  \n"
+	str2: .asciiz "Eingabe der zweite Zahl:   \n"
+	str3: .asciiz "Die gemeinsame Teiler lautet:""
+.text
+	#EINGABE START#
+	
+	#Print str1 message to the screen 
+	la $a0, str1
+	li $v0, 4
+	syscall
+	
+	li $v0, 5	#read integer
+	syscall 
+	move $s0,$v0	#move from v0 into s0 
+	
+	#Print str2 message to the screen 
+	la $a0, str2
+	li $v0, 4
+	syscall
+
+	li $v0, 5	#read integer
+	syscall 
+	move $s1,$v0	#move from v0 into s0 
+	
+	#EINGABE END# 
+	
+	#Vorbereitung der Unterprogramm START
+	move $a0,$s0 	#move from s0 into a0 	(R4)
+	move $a1,$s1 	#move from s1 into 1 	(R5)
+	
+	# unterprogram	jump and link zu euklid return		
+			jal euklied 	#Jump and link to addr euklied 
+			move $s4, $v0
+			
+			la $a0, str3
+			li $v0, 4
+			syscall
+			
+			move $a0, $s4
+			li $v0, 1
+			syscall
+			
+			li $v0, 10
+			syscall
+	euklied: 	#Funktion euklied
+	
+			move $t0,$a0	#move from a0 to t0 
+			move $t1, $a1	#move from a1 to t1 
+	serch:		
+			beq $t0,$t1, gemeinsame
+			bgt $t0,$t1, swap
+			
+			div $t1, $t0
+			mfhi $t9
+			beqz  $t9, gemeinsame 
+			add $t1,$0,$t0
+			add $t0, $0,$t9
+			j serch
+	swap:
+			add $a0, $0,$t1
+			add $t1,$0,$t0
+			add $t0, $0,$a0
+			j serch
+			
+			
+	gemeinsame: 
+			
+			move $v0, $t0
+			jr $ra
+			
+	
+			
+#Berechnet wird der größte gemeinsame Teiler der vorzeichenlosen Zahlen in r4 und r5, das Ergebnis wird nach r2 geschrieben:
+# c) Schreiben Sie das Programm so um, dass der Algorithmus als Unterprogramm aufgerufen werden kann!
+#Initialisieren Sie die Register r4 und r5 jeweils mit einemWertepaar aus Aufgabenteil b) und rufen Sie dann für jedes Wertepaar das Unterprogramm auf!
+	
